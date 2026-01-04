@@ -1,37 +1,35 @@
+import { Link } from "react-router";
 import addImg from "../images/add.png";
 
 const Home = () => {
   return (
     <div>
-      <div className="h-50 flex justify-around  border-b border-gray-400 bg-white px-3 py-2 font-bold">
-        <p className="flex w-32 justify-center truncate">作成名</p>
+      <div className="flex justify-around border-b border-gray-400 bg-white px-3 py-2 font-bold">
+        <p className="item-folder">作成名</p>
         <div className="border-r" />
-        <p className="flex w-32 justify-center truncate">作りたい度</p>
+        <p className="item-folder">作りたい度</p>
         <div className="border-r" />
-        <p className="flex w-32 justify-center truncate">ステータス</p>
+        <p className="item-folder">ステータス</p>
         <div className="border-r" />
-        <p className="flex w-32 justify-center truncate">作成日</p>
+        <p className="item-folder">作成日</p>
         <div className="border-r" />
-        <p className="flex w-32 justify-center truncate">更新日</p>
+        <p className="item-folder">更新日</p>
       </div>
-      <div className="h-50 mx-2 my-2 flex  justify-around rounded-md border border-gray-400 bg-white px-1 py-4">
-        <a
-          href="#"
-          className="flex w-32 justify-center truncate text-blue-500 underline"
-        >
+      <div className="item-folder-frame">
+        <Link to="/detail" className="item-folder-link">
           Todoリスト
-        </a>
+        </Link>
         <div className="border-r" />
-        <p className="flex w-32 justify-center truncate">高</p>
+        <p className="item-folder">高</p>
         <div className="border-r" />
-        <p className="flex w-32 justify-center truncate">Active</p>
+        <p className="item-folder">Active</p>
         <div className="border-r" />
-        <p className="flex w-32 justify-center truncate">2025/12/27</p>
+        <p className="item-folder">2025/12/27</p>
         <div className="border-r" />
-        <p className="flex w-32 justify-center truncate">2025/12/29</p>
+        <p className="item-folder">2025/12/29</p>
       </div>
-      <div className="h-50 m-2 mx-2 my-2  flex justify-around rounded-md border border-gray-400 bg-white px-1 py-4">
-        <img className="h-7 w-7" src={addImg} alt="" />
+      <div className="item-folder-frame">
+        <img className="add-img" src={addImg} alt="" />
       </div>
     </div>
   );

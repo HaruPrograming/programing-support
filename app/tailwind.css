@@ -2,3 +2,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .item-frame {
+    @apply flex m-5 w-64 text-lg border border-gray-400 rounded-md bg-white items-center justify-center;
+  }
+
+  .item-text {
+    @apply px-10 py-5;
+  }
+
+  .item-add-frame {
+    @apply flex m-5 w-64 text-lg border border-gray-400 rounded-md bg-white items-center justify-center h-16;
+  }
+
+  .add-img {
+    @apply h-8;
+  }
+
+  .detail {
+    @apply border border-gray-400 absolute right-0 m-5 h-5/6 w-1/2 flex-1 rounded-md bg-white p-3;
+  }
+
+  .item-folder-frame {
+    @apply m-2 flex justify-around rounded-md border border-gray-400 bg-white px-1 py-4;
+  }
+
+  .item-folder {
+    @apply flex w-32 justify-center truncate;
+  }
+
+  .item-folder-link {
+    @apply flex w-32 justify-center truncate text-blue-500 underline;
+  }
+
+}
