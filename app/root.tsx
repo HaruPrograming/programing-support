@@ -1,21 +1,23 @@
 // app/root.tsx
+import "./tailwind.css";
 import { Outlet, Meta, Links } from "react-router";
 import Header from "./Components/Header";
-import "./tailwind.css";
 
 export default function Root() {
   return (
-    <html lang="ja">
+    <html lang="ja" className="m-0 h-screen">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body className="h-screen bg-gray-200">
+      <div className="m-0 flex h-screen flex-col bg-gray-200">
         <Header /> {/* ← ここで全ページ共通 */}
-        <Outlet /> {/* routes.ts で指定した各レイアウト/ページ */}
-      </body>
+        <main className="flex-1">
+          <Outlet /> {/* routes.ts で指定した各レイアウト/ページ */}
+        </main>
+      </div>
     </html>
   );
 }

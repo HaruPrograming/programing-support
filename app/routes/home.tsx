@@ -30,7 +30,7 @@ const Home = () => {
         <div className="border-r" />
         <p className="flex w-32 justify-center truncate">2025/12/29</p>
       </div>
-      <div className="h-50 mx-2 my-2 flex  justify-around rounded-md border border-gray-400 bg-white px-1 py-4 m-2">
+      <div className="h-50 m-2 mx-2 my-2  flex justify-around rounded-md border border-gray-400 bg-white px-1 py-4">
         <img className="h-7 w-7" src={addImg} alt="" />
       </div>
     </div>
