@@ -1,43 +1,41 @@
 import { Link } from "react-router";
 import addImg from "../images/add.png";
-import { testData, type Item } from "../data/item/testData";
-import { useState, useEffect } from "react";
+import { Fragment } from "react/jsx-runtime";
+import { itemList } from "~/data/item/testData";
 
 const Home = () => {
-  const [items, setItems] = useState<Item[]>(testData);
 
-  return ( 
-    <div>
+  const headerList = ["作成名", "作りたい度", "ステータス", "作成日", "更新日"];
+
+  return (
+    <>
       <div className="flex justify-around border-b border-gray-400 bg-white px-3 py-2 font-bold">
-        <p className="item-folder">作成名</p>
-        <div className="border-r" />
-        <p className="item-folder">作りたい度</p>
-        <div className="border-r" />
-        <p className="item-folder">ステータス</p>
-        <div className="border-r" />
-        <p className="item-folder">作成日</p>
-        <div className="border-r" />
-        <p className="item-folder">更新日</p>
+        {headerList.map((header, index) => (
+          <Fragment key={header}>
+            <p className="item-folder">{header}</p>
+            {index !== headerList.length - 1 && <div className="border-r" />}
+          </Fragment>
+        ))}
       </div>
-      {items.map((item) => (
-        <div className="item-folder-frame">
-          <Link to="/detail" className="item-folder-link">
-            {item.name}
-          </Link>
-          <div className="border-r" />
-          <p className="item-folder">{item.priority}</p>
-          <div className="border-r" />
-          <p className="item-folder">{item.status}</p>
-          <div className="border-r" />
-          <p className="item-folder">{item.createdDate.toLocaleDateString()}</p>
-          <div className="border-r" />
-          <p className="item-folder">{item.updatedDate.toLocaleDateString()}</p>
-        </div>
-      ))}
+        {itemList.map((item) => (
+          <div className="item-folder-frame">
+            <Link to={`/detail/${item.id}`} className="item-folder-link">
+              {item.project_name}
+            </Link>
+            <div className="border-r" />
+            <p className="item-folder">{item.creation_level}</p>
+            <div className="border-r" />
+            <p className="item-folder">{item.status}</p>
+            <div className="border-r" />
+            <p className="item-folder">{item.created_date.toLocaleDateString()}</p>
+            <div className="border-r" />
+            <p className="item-folder">{item.updated_date.toLocaleDateString()}</p>
+          </div>
+        ))}
       <div className="item-folder-frame">
         <img className="add-img" src={addImg} alt="" />
       </div>
-    </div>
+    </>
   );
 };
 
