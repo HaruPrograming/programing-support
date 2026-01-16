@@ -30,9 +30,13 @@ export default [
       "tailwindcss/classnames-order": "error",
       "tailwindcss/no-custom-classname": "off",
       ...prettier.rules,
+      "no-console": "off",
     },
     settings: {
       react: { version: "detect" },
+    },
+    env: {
+      browser: true,
     },
   },
 ];

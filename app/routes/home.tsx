@@ -1,38 +1,46 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import addImg from "../images/add.png";
+import { Fragment } from "react";
+import { itemList } from "~/data/item/testData";
 
-const Home = () => {
+export default function Home() {
+  const headerList = ["作成名", "作りたい度", "ステータス", "作成日", "更新日"];
+
   return (
-    <div>
+    <>
       <div className="flex justify-around border-b border-gray-400 bg-white px-3 py-2 font-bold">
-        <p className="item-folder">作成名</p>
-        <div className="border-r" />
-        <p className="item-folder">作りたい度</p>
-        <div className="border-r" />
-        <p className="item-folder">ステータス</p>
-        <div className="border-r" />
-        <p className="item-folder">作成日</p>
-        <div className="border-r" />
-        <p className="item-folder">更新日</p>
+        {headerList.map((header, index) => (
+          <Fragment key={header}>
+            <p className="item-folder">{header}</p>
+            {index !== headerList.length - 1 && <div className="border-r" />}
+          </Fragment>
+        ))}
       </div>
-      <div className="item-folder-frame">
-        <Link to="/detail" className="item-folder-link">
-          Todoリスト
-        </Link>
-        <div className="border-r" />
-        <p className="item-folder">高</p>
-        <div className="border-r" />
-        <p className="item-folder">Active</p>
-        <div className="border-r" />
-        <p className="item-folder">2025/12/27</p>
-        <div className="border-r" />
-        <p className="item-folder">2025/12/29</p>
-      </div>
+
+      {itemList.map((item) => (
+        <div key={item.id} className="item-folder-frame">
+          <Link to={`/detail/${item.id}`} className="item-folder-link">
+            {item.project_name}
+          </Link>
+
+          <div className="border-r" />
+          <p className="item-folder">{item.creation_level}</p>
+          <div className="border-r" />
+          <p className="item-folder">{item.status}</p>
+          <div className="border-r" />
+          <p className="item-folder">
+            {item.created_date.toLocaleDateString()}
+          </p>
+          <div className="border-r" />
+          <p className="item-folder">
+            {item.updated_date.toLocaleDateString()}
+          </p>
+        </div>
+      ))}
+
       <div className="item-folder-frame">
         <img className="add-img" src={addImg} alt="" />
       </div>
-    </div>
+    </>
   );
-};
-
-export default Home;
+}
