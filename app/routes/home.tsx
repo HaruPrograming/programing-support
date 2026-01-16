@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import addImg from "../images/add.png";
 import { Fragment } from "react";
 import { itemList } from "~/data/item/testData";
+import { useHeader } from "~/context/HeaderContext";
 
 export default function Home() {
   const headerList = ["作成名", "作りたい度", "ステータス", "作成日", "更新日"];
+  const { headerTitle, setHeaderTitle } = useHeader();
 
   return (
     <>
@@ -19,7 +21,7 @@ export default function Home() {
 
       {itemList.map((item) => (
         <div key={item.id} className="item-folder-frame">
-          <Link to={`/detail/${item.id}`} className="item-folder-link">
+          <Link to={`/detail/${item.id}`} className="item-folder-link" onClick={() => setHeaderTitle(item.project_name)}>
             {item.project_name}
           </Link>
 

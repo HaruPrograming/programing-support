@@ -46,8 +46,7 @@ const Header = () => {
           </>
         ) : (
           <>
-            <p className="mr-2">{headerTitle}</p>
-            <p>aaa</p>
+            <p className="mr-2">{headerTitle} ＞ </p>
           </>
         )}
       </div>
