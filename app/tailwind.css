@@ -36,4 +36,7 @@
     @apply flex w-32 justify-center truncate text-blue-500 underline;
   }
 
+  .select-item {
+    @apply border-2 border-red-500;
+  }
 }

@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { useHeader } from "../context/HeaderContext";
+import { useHeader } from "../../context/HeaderContext";
 import { useState, useEffect } from "react";
 
 const Header = () => {
