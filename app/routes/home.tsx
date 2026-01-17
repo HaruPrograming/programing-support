@@ -17,22 +17,22 @@ export default function Home() {
 
   useEffect(() => {
     console.log("addPro", addProject);
-    const handleClick = (e: MouseEvent) => {
+    const handleProjectClick = (e: MouseEvent) => {
       if (!targetRef.current) return;
       // divの中をクリック → 何もしない
       if (targetRef.current.contains(e.target as Node)) return;
       // divの外をクリック
-      handleAddProject();
+      setAddProject(false);
       toast.success("登録が完了しました。");
       setCreationLevelValue("低");
       setStatusValue("New");
       console.log("外側クリック", addProject);
     };
-    document.addEventListener("click", handleClick);
+    document.addEventListener("click", handleProjectClick);
     return () => {
-      document.removeEventListener("click", handleClick);
+      document.removeEventListener("click", handleProjectClick);
     };
-  }, []);
+  }, [addProject]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -58,7 +58,7 @@ export default function Home() {
   }, [isRunning]);
 
   const handleAddProject = () => {
-    setAddProject((addProject) => !addProject);
+    setAddProject(true)
   };
 
   const handleCreationLevelChange = (
@@ -126,7 +126,7 @@ export default function Home() {
         <div className="item-folder-frame select-item" ref={targetRef}>
           <input
             type="text"
-            className="border border-gray-400 w-32 rounded-md"
+            className="input-box"
           />
           <div className="border-r" />
           <select
@@ -134,7 +134,7 @@ export default function Home() {
             id=""
             value={creationLevelValue}
             onChange={handleCreationLevelChange}
-            className="border border-gray-400 w-32 rounded-md text-center"
+            className="input-box text-center"
           >
             <option value="高">高</option>
             <option value="中">中</option>
@@ -146,15 +146,15 @@ export default function Home() {
             id=""
             value={statusValue}
             onChange={handleStatusChange}
-            className="border border-gray-400 w-32 rounded-md text-center"
+            className="input-box text-center"
           >
             <option value="New">New</option>
             <option value="Active">Active</option>
           </select>
           <div className="border-r" />
-          <p className="text-center w-32">{now}</p>
+          <p className="text-center w-32 flex items-center">{now}</p>
           <div className="border-r" />
-          <p className="text-center w-32">{now}</p>
+          <p className="text-center w-32 flex items-center">{now}</p>
         </div>
       ) : (
         <div
