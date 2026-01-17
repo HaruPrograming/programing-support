@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
-import Header from "./components/Header";
+import { Toaster } from "sonner";
+import Header from "./components/layout/Header";
 import { HeaderProvider } from "./context/HeaderContext";
 
 export default function Root() {
@@ -8,6 +9,7 @@ export default function Root() {
       <HeaderProvider>
         <Header />
         <main>
+          <Toaster richColors position="top-right" />
           <Outlet />
         </main>
       </HeaderProvider>
