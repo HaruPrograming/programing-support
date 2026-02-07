@@ -4,6 +4,8 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { itemList } from "~/data/item/testData";
 import { useHeader } from "~/context/HeaderContext";
 import { toast } from "sonner";
+import { fetchProjects } from "../../services/projectApi";
+import { type Project } from "../../types/project";
 
 export default function Home() {
   const headerList = ["作成名", "作りたい度", "ステータス", "作成日", "更新日"];
@@ -14,6 +16,20 @@ export default function Home() {
   const [now, setNow] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const targetRef = useRef<HTMLDivElement>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const data = await fetchProjects();
+        setProjects(data);
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      }
+    };
+
+    loadProjects();
+  }, []);
 
   useEffect(() => {
     console.log("addPro", addProject);
@@ -97,7 +113,7 @@ export default function Home() {
         ))}
       </div>
 
-      {itemList.map((item) => (
+      {projects.map((item) => (
         <div key={item.id} className="item-folder-frame">
           <Link
             to={`/detail/${item.id}`}
@@ -113,21 +129,18 @@ export default function Home() {
           <p className="item-folder">{item.status}</p>
           <div className="border-r" />
           <p className="item-folder">
-            {item.created_date.toLocaleDateString()}
+            {item.created_at}
           </p>
           <div className="border-r" />
           <p className="item-folder">
-            {item.updated_date.toLocaleDateString()}
+            {item.updated_at}
           </p>
         </div>
       ))}
 
       {addProject ? (
         <div className="item-folder-frame select-item" ref={targetRef}>
-          <input
-            type="text"
-            className="input-box"
-          />
+          <input type="text" className="input-box" />
           <div className="border-r" />
           <select
             name=""
@@ -136,9 +149,9 @@ export default function Home() {
             onChange={handleCreationLevelChange}
             className="input-box text-center"
           >
-            <option value="高">高</option>
-            <option value="中">中</option>
-            <option value="低">低</option>
+            <option value="3">高</option>
+            <option value="2">中</option>
+            <option value="1">低</option>
           </select>
           <div className="border-r" />
           <select
@@ -148,8 +161,8 @@ export default function Home() {
             onChange={handleStatusChange}
             className="input-box text-center"
           >
-            <option value="New">New</option>
-            <option value="Active">Active</option>
+            <option value="1">New</option>
+            <option value="2">Active</option>
           </select>
           <div className="border-r" />
           <p className="text-center w-32 flex items-center">{now}</p>
