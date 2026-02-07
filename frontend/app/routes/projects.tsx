@@ -41,8 +41,8 @@ export default function Home() {
       // divの外をクリック
       setAddProject(false);
       toast.success("登録が完了しました。");
-      setCreationLevelValue("低");
-      setStatusValue("New");
+      setCreationLevelValue("1");
+      setStatusValue("1");
       console.log("外側クリック", addProject);
     };
     document.addEventListener("click", handleProjectClick);
