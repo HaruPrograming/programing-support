@@ -6,13 +6,14 @@ import { useHeader } from "~/context/HeaderContext";
 import { toast } from "sonner";
 import { fetchProjects } from "../../services/projectApi";
 import { type Project } from "../../types/project";
+import { formatDatetypeYYYYMMDDhhmm } from "../../utils/date-format";
 
 export default function Home() {
   const headerList = ["作成名", "作りたい度", "ステータス", "作成日", "更新日"];
   const { headerTitle, setHeaderTitle } = useHeader();
   const [addProject, setAddProject] = useState(false);
-  const [creationLevelValue, setCreationLevelValue] = useState("低");
-  const [statusValue, setStatusValue] = useState("New");
+  const [creationLevelValue, setCreationLevelValue] = useState("1");
+  const [statusValue, setStatusValue] = useState("1");
   const [now, setNow] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const targetRef = useRef<HTMLDivElement>(null);
@@ -56,7 +57,7 @@ export default function Home() {
     const tick = () => {
       console.log("isRunning", isRunning);
       if (!isRunning) return;
-      setNow(formatDate(nowJST()));
+      setNow(formatDatetypeYYYYMMDDhhmm(nowJST().toISOString()));
 
       // 次の0秒までの時間を計算（最低でも100msにする）
       const msUntilNextMinute = Math.max(
@@ -93,15 +94,6 @@ export default function Home() {
     );
   };
 
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${year}/${month}/${day} ${hours}:${minutes}`;
-  };
-
   return (
     <>
       <div className="flex justify-around border-b border-gray-400 bg-white px-3 py-2 font-bold">
@@ -124,17 +116,32 @@ export default function Home() {
           </Link>
 
           <div className="border-r" />
-          <p className="item-folder">{item.creation_level}</p>
+          <select
+            name=""
+            id=""
+            defaultValue={item.creation_level}
+            onChange={handleCreationLevelChange}
+            className="input-box text-center"
+          >
+            <option value="3">高</option>
+            <option value="2">中</option>
+            <option value="1">低</option>
+          </select>
           <div className="border-r" />
-          <p className="item-folder">{item.status}</p>
+          <select
+            name=""
+            id=""
+            defaultValue={item.status}
+            onChange={handleStatusChange}
+            className="input-box text-center"
+          >
+            <option value="1">New</option>
+            <option value="2">Active</option>
+          </select>
           <div className="border-r" />
-          <p className="item-folder">
-            {item.created_at}
-          </p>
+          <p className="item-folder">{formatDatetypeYYYYMMDDhhmm(item.created_at)}</p>
           <div className="border-r" />
-          <p className="item-folder">
-            {item.updated_at}
-          </p>
+          <p className="item-folder">{formatDatetypeYYYYMMDDhhmm(item.updated_at)}</p>
         </div>
       ))}
 
