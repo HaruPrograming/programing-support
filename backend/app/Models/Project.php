@@ -10,6 +10,8 @@ class Project extends Model
         'project_name',
         'creation_level',
         'status',
-        'technologies',
+        'used_technologies',
+        'created_at',
+        'updated_at',
     ];
 }

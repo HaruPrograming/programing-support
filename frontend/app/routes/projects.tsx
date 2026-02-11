@@ -7,17 +7,19 @@ import { toast } from "sonner";
 import { fetchProjects } from "../../services/projectApi";
 import { type Project } from "../../types/project";
 import { formatDatetypeYYYYMMDDhhmm } from "../../utils/date-format";
+import { createProject } from "../../services/projectApi";
 
 export default function Home() {
   const headerList = ["作成名", "作りたい度", "ステータス", "作成日", "更新日"];
+  const targetRef = useRef<HTMLDivElement>(null);
   const { headerTitle, setHeaderTitle } = useHeader();
+  const [now, setNow] = useState("");
+  const [projects, setProjects] = useState<Project[]>([]);
   const [addProject, setAddProject] = useState(false);
+  const [name, setName] = useState("");
   const [creationLevelValue, setCreationLevelValue] = useState("1");
   const [statusValue, setStatusValue] = useState("1");
-  const [now, setNow] = useState("");
   const [isRunning, setIsRunning] = useState(false);
-  const targetRef = useRef<HTMLDivElement>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -33,7 +35,27 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    console.log("addPro", addProject);
+    console.log(
+      "addPro",
+      addProject,
+      name,
+      creationLevelValue,
+      statusValue,
+      statusValue,
+    );
+    createProject({
+      project_name: name,
+      creation_level: Number(creationLevelValue),
+      status: Number(statusValue),
+      used_technologies: "",
+      id: undefined,
+      updated_at: function (updated_at: any): import("react").ReactNode {
+        throw new Error("Function not implemented.");
+      },
+      created_at: function (created_at: any): import("react").ReactNode {
+        throw new Error("Function not implemented.");
+      }
+    });
     const handleProjectClick = (e: MouseEvent) => {
       if (!targetRef.current) return;
       // divの中をクリック → 何もしない
@@ -62,7 +84,7 @@ export default function Home() {
       // 次の0秒までの時間を計算（最低でも100msにする）
       const msUntilNextMinute = Math.max(
         100,
-        (60 - new Date().getSeconds()) * 1000 - new Date().getMilliseconds()
+        (60 - new Date().getSeconds()) * 1000 - new Date().getMilliseconds(),
       );
 
       timer = setTimeout(tick, msUntilNextMinute);
@@ -75,11 +97,11 @@ export default function Home() {
   }, [isRunning]);
 
   const handleAddProject = () => {
-    setAddProject(true)
+    setAddProject(true);
   };
 
   const handleCreationLevelChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
+    e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     setCreationLevelValue(e.target.value);
   };
@@ -90,7 +112,7 @@ export default function Home() {
 
   const nowJST = () => {
     return new Date(
-      new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" })
+      new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" }),
     );
   };
 
@@ -137,17 +159,27 @@ export default function Home() {
           >
             <option value="1">New</option>
             <option value="2">Active</option>
+            <option value="3">closed</option>
           </select>
           <div className="border-r" />
-          <p className="item-folder">{formatDatetypeYYYYMMDDhhmm(item.created_at)}</p>
+          <p className="item-folder">
+            {formatDatetypeYYYYMMDDhhmm(item.created_at)}
+          </p>
           <div className="border-r" />
-          <p className="item-folder">{formatDatetypeYYYYMMDDhhmm(item.updated_at)}</p>
+          <p className="item-folder">
+            {formatDatetypeYYYYMMDDhhmm(item.updated_at)}
+          </p>
         </div>
       ))}
 
       {addProject ? (
         <div className="item-folder-frame select-item" ref={targetRef}>
-          <input type="text" className="input-box" />
+          <input
+            type="text"
+            className="input-box"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
           <div className="border-r" />
           <select
             name=""
@@ -170,6 +202,7 @@ export default function Home() {
           >
             <option value="1">New</option>
             <option value="2">Active</option>
+            <option value="3">closed</option>
           </select>
           <div className="border-r" />
           <p className="text-center w-32 flex items-center">{now}</p>
