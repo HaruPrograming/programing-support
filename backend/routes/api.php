@@ -6,3 +6,4 @@ use App\Http\Controllers\ProjectController;
 Route::get('/projects', [ProjectController::class, 'index']);
 Route::post('/projects', [ProjectController::class, 'create']);
 Route::put('/projects/{id}', [ProjectController::class, 'update']);
+Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);

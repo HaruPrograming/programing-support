@@ -3,11 +3,16 @@ import addImg from "../images/add.png";
 import { Fragment, useEffect, useRef, useState, useCallback } from "react";
 import { useHeader } from "~/context/HeaderContext";
 import { toast } from "sonner";
-import { fetchProjects, createProject } from "../../services/projectApi";
+import {
+  fetchProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from "../../services/projectApi";
+
 import { type Project, type CreateProject } from "../../types/project";
 import { formatDatetypeYYYYMMDDhhmm } from "../../utils/date-format";
 import { useClickOutside } from "~/hooks/useClickOutside";
-import { updateProject } from "../../services/projectApi";
 
 export default function Home() {
   const headerList = ["作成名", "作りたい度", "ステータス", "作成日", "更新日"];
@@ -43,7 +48,7 @@ export default function Home() {
   }, []);
 
   /* ===============================
-      外クリック → 保存
+      プロジェクト追加
   =============================== */
 
   const handleCreateProject = useCallback(async () => {
@@ -53,12 +58,6 @@ export default function Home() {
       toast.error("プロジェクト名を入力してください");
       return;
     }
-
-    console.log("送信データ", {
-      name,
-      creationLevelValue,
-      statusValue,
-    });
 
     try {
       const newProject: CreateProject = {
@@ -87,7 +86,7 @@ export default function Home() {
   useClickOutside(targetRef, handleCreateProject);
 
   /* ===============================
-      時計表示
+      時計
   =============================== */
 
   useEffect(() => {
@@ -118,7 +117,7 @@ export default function Home() {
   };
 
   /* ===============================
-      プロジェクト追加開始
+      追加開始
   =============================== */
 
   const handleAddProject = () => {
@@ -126,18 +125,20 @@ export default function Home() {
     setIsRunning(true);
   };
 
+  /* ===============================
+      更新
+  =============================== */
+
   const handleProjectUpdate = async (
     id: number,
     field: "creation_level" | "status",
     value: number,
   ) => {
-    // ① UI更新（Optimistic Update）
     setProjects((prev) =>
       prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)),
     );
 
     try {
-      // ② DB更新
       await updateProject(id, {
         [field]: value,
       });
@@ -147,6 +148,32 @@ export default function Home() {
       console.error(error);
       toast.error("更新に失敗しました");
     }
+  };
+
+  /* ===============================
+      削除
+  =============================== */
+
+  const handleDeleteProject = async (id: number) => {
+    try {
+      await deleteProject(id);
+
+      setProjects((prev) => prev.filter((p) => p.id !== id));
+
+      toast.success("削除しました");
+    } catch (error) {
+      console.error(error);
+      toast.error("削除に失敗しました");
+    }
+  };
+
+  const confirmDelete = (id: number, taskName: string) => {
+    toast(`本当に"${taskName}"を削除しますか？`, {
+      action: {
+        label: "削除",
+        onClick: () => handleDeleteProject(id),
+      },
+    });
   };
 
   return (
@@ -163,7 +190,18 @@ export default function Home() {
 
       {/* プロジェクト一覧 */}
       {projects.map((item) => (
-        <div key={item.id} className="item-folder-frame">
+        <div key={item.id} className="item-folder-frame relative">
+          {/* 削除ボタン */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              confirmDelete(item.id, item.project_name);
+            }}
+            className="absolute right-2 top-1 text-red-500 font-bold text-lg hover:scale-110"
+          >
+            ×
+          </button>
+
           <Link
             to={`/detail/${item.id}`}
             className="item-folder-link"
@@ -201,7 +239,7 @@ export default function Home() {
           >
             <option value={1}>New</option>
             <option value={2}>Active</option>
-            <option value={3}>closed</option>
+            <option value={3}>Closed</option>
           </select>
 
           <div className="border-r" />
@@ -250,7 +288,7 @@ export default function Home() {
           >
             <option value={1}>New</option>
             <option value={2}>Active</option>
-            <option value={3}>closed</option>
+            <option value={3}>Closed</option>
           </select>
 
           <div className="border-r" />

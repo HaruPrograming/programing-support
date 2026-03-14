@@ -33,3 +33,15 @@ export const updateProject = async (id: number, data: Partial<Project>) => {
 
   return res.json();
 };
+
+export const deleteProject = async (id: number) => {
+  const res = await fetch(`/api/projects/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    throw new Error("削除失敗");
+  }
+
+  return true;
+};

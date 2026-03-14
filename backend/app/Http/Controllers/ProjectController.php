@@ -41,4 +41,14 @@ class ProjectController extends Controller
 
         return response()->json($project);
     }
+
+    public function destroy($id)
+    {
+        $project = Project::findOrFail($id);
+        $project->delete();
+
+        return response()->json([
+            'message' => 'deleted'
+        ]);
+    }
 }
