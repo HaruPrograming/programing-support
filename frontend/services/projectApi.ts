@@ -1,15 +1,15 @@
-import { type Project } from "../types/project";
+import { type Project, type CreateProject } from "../types/project";
 
 export async function fetchProjects(): Promise<Project[]> {
-  const res = await fetch("http://localhost:8000/api/projects");
+  const res = await fetch("/api/projects");
 
   if (!res.ok) throw new Error("API error");
 
   return res.json();
 }
 
-export const createProject = async (data: Project) => {
-  const res = await fetch("http://localhost:8000/api/projects", {
+export const createProject = async (data: CreateProject) => {
+  const res = await fetch("/api/projects", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
