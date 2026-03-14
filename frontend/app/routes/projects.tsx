@@ -7,6 +7,7 @@ import { fetchProjects, createProject } from "../../services/projectApi";
 import { type Project, type CreateProject } from "../../types/project";
 import { formatDatetypeYYYYMMDDhhmm } from "../../utils/date-format";
 import { useClickOutside } from "~/hooks/useClickOutside";
+import { updateProject } from "../../services/projectApi";
 
 export default function Home() {
   const headerList = ["作成名", "作りたい度", "ステータス", "作成日", "更新日"];
@@ -125,6 +126,29 @@ export default function Home() {
     setIsRunning(true);
   };
 
+  const handleProjectUpdate = async (
+    id: number,
+    field: "creation_level" | "status",
+    value: number,
+  ) => {
+    // ① UI更新（Optimistic Update）
+    setProjects((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)),
+    );
+
+    try {
+      // ② DB更新
+      await updateProject(id, {
+        [field]: value,
+      });
+
+      toast.success("更新しました");
+    } catch (error) {
+      console.error(error);
+      toast.error("更新に失敗しました");
+    }
+  };
+
   return (
     <>
       {/* ヘッダー */}
@@ -152,7 +176,13 @@ export default function Home() {
 
           <select
             value={item.creation_level}
-            onChange={(e) => setCreationLevelValue(item.creation_level)}
+            onChange={(e) =>
+              handleProjectUpdate(
+                item.id,
+                "creation_level",
+                Number(e.target.value),
+              )
+            }
             className="input-box text-center"
           >
             <option value={1}>低</option>
@@ -164,7 +194,9 @@ export default function Home() {
 
           <select
             value={item.status}
-            onChange={(e) => setStatusValue(item.status)}
+            onChange={(e) =>
+              handleProjectUpdate(item.id, "status", Number(e.target.value))
+            }
             className="input-box text-center"
           >
             <option value={1}>New</option>

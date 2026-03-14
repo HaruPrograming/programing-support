@@ -28,4 +28,17 @@ class ProjectController extends Controller
 
         return response()->json($project, 201);
     }
+
+    public function update(Request $request, $id)
+    {
+        $project = Project::findOrFail($id);
+
+        // 更新
+        $project->update($request->only([
+            'creation_level',
+            'status'
+        ]));
+
+        return response()->json($project);
+    }
 }
