@@ -1,25 +1,32 @@
 import { Link } from "react-router-dom";
 import addImg from "../images/add.png";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { itemList } from "~/data/item/testData";
+import { Fragment, useEffect, useRef, useState, useCallback } from "react";
 import { useHeader } from "~/context/HeaderContext";
 import { toast } from "sonner";
-import { fetchProjects } from "../../services/projectApi";
-import { type Project } from "../../types/project";
+import { fetchProjects, createProject } from "../../services/projectApi";
+import { type Project, type CreateProject } from "../../types/project";
 import { formatDatetypeYYYYMMDDhhmm } from "../../utils/date-format";
-import { createProject } from "../../services/projectApi";
+import { useClickOutside } from "~/hooks/useClickOutside";
 
 export default function Home() {
   const headerList = ["作成名", "作りたい度", "ステータス", "作成日", "更新日"];
+
+  const { setHeaderTitle } = useHeader();
   const targetRef = useRef<HTMLDivElement>(null);
-  const { headerTitle, setHeaderTitle } = useHeader();
-  const [now, setNow] = useState("");
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [addProject, setAddProject] = useState(false);
+
   const [name, setName] = useState("");
-  const [creationLevelValue, setCreationLevelValue] = useState("1");
-  const [statusValue, setStatusValue] = useState("1");
+  const [creationLevelValue, setCreationLevelValue] = useState(1);
+  const [statusValue, setStatusValue] = useState(1);
+
+  const [now, setNow] = useState("");
   const [isRunning, setIsRunning] = useState(false);
+
+  /* ===============================
+      プロジェクト一覧取得
+  =============================== */
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -34,81 +41,74 @@ export default function Home() {
     loadProjects();
   }, []);
 
-  useEffect(() => {
-    console.log(
-      "addPro",
-      addProject,
+  /* ===============================
+      外クリック → 保存
+  =============================== */
+
+  const handleCreateProject = useCallback(async () => {
+    if (!addProject) return;
+
+    if (!name.trim()) {
+      toast.error("プロジェクト名を入力してください");
+      return;
+    }
+
+    console.log("送信データ", {
       name,
       creationLevelValue,
       statusValue,
-      statusValue,
-    );
-    createProject({
-      project_name: name,
-      creation_level: Number(creationLevelValue),
-      status: Number(statusValue),
-      used_technologies: "",
-      id: undefined,
-      updated_at: function (updated_at: any): import("react").ReactNode {
-        throw new Error("Function not implemented.");
-      },
-      created_at: function (created_at: any): import("react").ReactNode {
-        throw new Error("Function not implemented.");
-      }
     });
-    const handleProjectClick = (e: MouseEvent) => {
-      if (!targetRef.current) return;
-      // divの中をクリック → 何もしない
-      if (targetRef.current.contains(e.target as Node)) return;
-      // divの外をクリック
+
+    try {
+      const newProject: CreateProject = {
+        project_name: name,
+        creation_level: creationLevelValue,
+        status: statusValue,
+        used_technologies: "",
+      };
+
+      const createdProject = await createProject(newProject);
+
+      setProjects((prev) => [...prev, createdProject]);
+
       setAddProject(false);
-      toast.success("登録が完了しました。");
-      setCreationLevelValue("1");
-      setStatusValue("1");
-      console.log("外側クリック", addProject);
-    };
-    document.addEventListener("click", handleProjectClick);
-    return () => {
-      document.removeEventListener("click", handleProjectClick);
-    };
-  }, [addProject]);
+      setName("");
+      setCreationLevelValue(1);
+      setStatusValue(1);
+
+      toast.success("登録が完了しました");
+    } catch (error) {
+      console.error("Failed to create project:", error);
+      toast.error("プロジェクトの追加に失敗しました");
+    }
+  }, [addProject, name, creationLevelValue, statusValue]);
+
+  useClickOutside(targetRef, handleCreateProject);
+
+  /* ===============================
+      時計表示
+  =============================== */
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
     const tick = () => {
-      console.log("isRunning", isRunning);
       if (!isRunning) return;
+
       setNow(formatDatetypeYYYYMMDDhhmm(nowJST().toISOString()));
 
-      // 次の0秒までの時間を計算（最低でも100msにする）
       const msUntilNextMinute = Math.max(
         100,
         (60 - new Date().getSeconds()) * 1000 - new Date().getMilliseconds(),
       );
 
       timer = setTimeout(tick, msUntilNextMinute);
-      console.log("tick");
     };
 
-    tick(); // 最初の1回
+    tick();
 
-    return () => clearTimeout(timer); // クリーンアップ
+    return () => clearTimeout(timer);
   }, [isRunning]);
-
-  const handleAddProject = () => {
-    setAddProject(true);
-  };
-
-  const handleCreationLevelChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    setCreationLevelValue(e.target.value);
-  };
-
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusValue(e.target.value);
-  };
 
   const nowJST = () => {
     return new Date(
@@ -116,8 +116,18 @@ export default function Home() {
     );
   };
 
+  /* ===============================
+      プロジェクト追加開始
+  =============================== */
+
+  const handleAddProject = () => {
+    setAddProject(true);
+    setIsRunning(true);
+  };
+
   return (
     <>
+      {/* ヘッダー */}
       <div className="flex justify-around border-b border-gray-400 bg-white px-3 py-2 font-bold">
         {headerList.map((header, index) => (
           <Fragment key={header}>
@@ -127,6 +137,7 @@ export default function Home() {
         ))}
       </div>
 
+      {/* プロジェクト一覧 */}
       {projects.map((item) => (
         <div key={item.id} className="item-folder-frame">
           <Link
@@ -138,40 +149,44 @@ export default function Home() {
           </Link>
 
           <div className="border-r" />
+
           <select
-            name=""
-            id=""
-            defaultValue={item.creation_level}
-            onChange={handleCreationLevelChange}
+            value={item.creation_level}
+            onChange={(e) => setCreationLevelValue(item.creation_level)}
             className="input-box text-center"
           >
-            <option value="3">高</option>
-            <option value="2">中</option>
-            <option value="1">低</option>
+            <option value={1}>低</option>
+            <option value={2}>中</option>
+            <option value={3}>高</option>
           </select>
+
           <div className="border-r" />
+
           <select
-            name=""
-            id=""
-            defaultValue={item.status}
-            onChange={handleStatusChange}
+            value={item.status}
+            onChange={(e) => setStatusValue(item.status)}
             className="input-box text-center"
           >
-            <option value="1">New</option>
-            <option value="2">Active</option>
-            <option value="3">closed</option>
+            <option value={1}>New</option>
+            <option value={2}>Active</option>
+            <option value={3}>closed</option>
           </select>
+
           <div className="border-r" />
+
           <p className="item-folder">
-            {formatDatetypeYYYYMMDDhhmm(item.created_at)}
+            {formatDatetypeYYYYMMDDhhmm(item.created_at.toString())}
           </p>
+
           <div className="border-r" />
+
           <p className="item-folder">
-            {formatDatetypeYYYYMMDDhhmm(item.updated_at)}
+            {formatDatetypeYYYYMMDDhhmm(item.updated_at.toString())}
           </p>
         </div>
       ))}
 
+      {/* 追加フォーム */}
       {addProject ? (
         <div className="item-folder-frame select-item" ref={targetRef}>
           <input
@@ -179,44 +194,43 @@ export default function Home() {
             className="input-box"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            placeholder="プロジェクト名"
           />
+
           <div className="border-r" />
+
           <select
-            name=""
-            id=""
             value={creationLevelValue}
-            onChange={handleCreationLevelChange}
+            onChange={(e) => setCreationLevelValue(Number(e.target.value))}
             className="input-box text-center"
           >
-            <option value="3">高</option>
-            <option value="2">中</option>
-            <option value="1">低</option>
+            <option value={1}>低</option>
+            <option value={2}>中</option>
+            <option value={3}>高</option>
           </select>
+
           <div className="border-r" />
+
           <select
-            name=""
-            id=""
             value={statusValue}
-            onChange={handleStatusChange}
+            onChange={(e) => setStatusValue(Number(e.target.value))}
             className="input-box text-center"
           >
-            <option value="1">New</option>
-            <option value="2">Active</option>
-            <option value="3">closed</option>
+            <option value={1}>New</option>
+            <option value={2}>Active</option>
+            <option value={3}>closed</option>
           </select>
+
           <div className="border-r" />
+
           <p className="text-center w-32 flex items-center">{now}</p>
+
           <div className="border-r" />
+
           <p className="text-center w-32 flex items-center">{now}</p>
         </div>
       ) : (
-        <div
-          className={"item-folder-frame"}
-          onClick={() => {
-            handleAddProject();
-            setIsRunning(true);
-          }}
-        >
+        <div className="item-folder-frame" onClick={handleAddProject}>
           <img className="add-img" src={addImg} alt="" />
         </div>
       )}
